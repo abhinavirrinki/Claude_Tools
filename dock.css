@@ -1,0 +1,381 @@
+#prompt-dock {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2147483647;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: none;
+  height: 140px; 
+  width: 50px;
+  justify-content: center;
+  will-change: transform;
+}
+
+#prompt-dock * {
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+
+.dock-collapsed {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 7px;
+  padding: 16px 12px;
+  pointer-events: all;
+  cursor: pointer;
+}
+
+.dock-line {
+  height: 4px;
+  background: rgba(218, 119, 86, 0.5);
+  border-radius: 2px 0 0 2px;
+  transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  transform-origin: right center;
+}
+
+.dock-line-0 { width: 12px; }
+.dock-line-1 { width: 20px; }
+.dock-line-2 { width: 25px; }
+.dock-line-3 { width: 28px; }
+.dock-line-4 { width: 28px; }
+.dock-line-5 { width: 25px; }
+.dock-line-6 { width: 20px; }
+.dock-line-7 { width: 12px; }
+
+.dock-expanded {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(18, 16, 28, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: none;
+  border-radius: 16px 0 0 16px;
+  padding: 16px 0 0 0;
+  min-width: 290px;
+  max-width: 330px;
+  height: auto;
+  min-height: 110px; 
+  max-height: 75vh;
+  pointer-events: all;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s cubic-bezier(0.25, 1, 0.5, 1), 
+              visibility 0.2s, 
+              min-height 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: visible; 
+}
+
+.dock-expanded-header {
+  padding: 0 16px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  flex-shrink: 0; 
+  position: relative;
+}
+
+.dock-header-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dock-expanded-header span {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+#dock-back-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.4);
+  display: none; 
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, transform 0.1s;
+}
+
+#dock-back-btn.visible {
+  display: flex; 
+}
+
+#dock-back-btn:hover {
+  color: rgba(218, 119, 86, 1);
+  transform: scale(1.15);
+}
+
+.dock-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dock-count-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(218, 119, 86, 0.95);
+  background: rgba(218, 119, 86, 0.14);
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+.dock-header-menu-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: -0.5px;
+  color: rgba(255, 255, 255, 0.35);
+  transition: color 0.15s ease, opacity 0.15s ease;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+  width: 20px;
+}
+
+.dock-header-menu-btn:hover {
+  color: rgba(218, 119, 86, 1);
+}
+
+.dock-header-menu-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#dock-header-dropdown {
+  position: absolute;
+  top: 36px;
+  right: 44px;
+  background: rgba(26, 23, 41, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  padding: 4px;
+  min-width: 120px;
+  z-index: 2147483647;
+  animation: dropdown-fade-in 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+#dock-row-dropdown {
+  background: rgba(26, 23, 41, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  padding: 4px;
+  min-width: 110px;
+  z-index: 2147483647;
+  animation: dropdown-fade-in 0.12s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@keyframes dropdown-fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dock-dropdown-item, .dock-row-dropdown-item {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+
+.dock-dropdown-item:hover, .dock-row-dropdown-item:hover {
+  background: rgba(218, 119, 86, 0.15);
+  color: rgba(255, 255, 255, 1);
+}
+
+.dock-dropdown-item span, .dock-row-dropdown-item span {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 11px;
+}
+
+#dock-prompt-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+
+#dock-prompt-list::-webkit-scrollbar { width: 4px; }
+#dock-prompt-list::-webkit-scrollbar-track { background: transparent; }
+#dock-prompt-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 2px; }
+
+.dock-prompt-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  position: relative;
+  transition: background 0.2s ease, padding 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.dock-prompt-item:hover { 
+  background: rgba(255, 255, 255, 0.04); 
+}
+
+.dock-meta-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 34px; 
+  flex-shrink: 0;
+}
+
+.dock-prompt-num {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(218, 119, 86, 0.45);
+  transition: color 0.15s;
+  text-align: center;
+}
+
+.dock-prompt-item:hover .dock-prompt-num { 
+  color: rgba(218, 119, 86, 1); 
+}
+
+.dock-action-tray {
+  display: flex;
+  flex-direction: row; 
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0;
+  overflow: hidden;
+  transition: max-height 0.25s cubic-bezier(0.25, 1, 0.5, 1), 
+              opacity 0.2s ease, 
+              margin-top 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.dock-prompt-item:hover .dock-action-tray {
+  max-height: 20px; 
+  opacity: 1;
+  margin-top: 6px;
+}
+
+.dock-star-btn.starred {
+  color: #ffb703 !important;
+}
+
+.dock-prompt-item.is-starred-row .dock-action-tray {
+  max-height: 20px;
+  opacity: 1;
+  margin-top: 6px;
+}
+
+.dock-star-btn, .dock-more-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.25);
+  transition: color 0.15s ease, transform 0.1s ease;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dock-star-btn {
+  font-size: 12px;
+  height: 12px;
+  width: 12px;
+}
+
+.dock-more-btn {
+  font-size: 10px;
+  letter-spacing: -0.5px;
+  height: 12px;
+  width: 14px;
+  padding-top: 1px; 
+}
+
+.dock-star-btn:hover {
+  color: #ffb703;
+  transform: scale(1.15);
+}
+
+.dock-more-btn:hover {
+  color: rgba(218, 119, 86, 1);
+  transform: scale(1.15);
+}
+
+.dock-prompt-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+.dock-prompt-item.active { background: rgba(218, 119, 86, 0.08); }
+.dock-prompt-item.active .dock-prompt-text { color: rgba(255, 255, 255, 1); font-weight: 500; }
+.dock-prompt-item.active .dock-prompt-num { color: rgba(218, 119, 86, 1); }
+
+#prompt-dock:hover .dock-collapsed,
+#prompt-dock.is-filtering .dock-collapsed { 
+  visibility: hidden; 
+}
+
+#prompt-dock:hover .dock-expanded,
+#prompt-dock.is-filtering .dock-expanded { 
+  opacity: 1; 
+  visibility: visible; 
+}
+
+#prompt-dock:hover .dock-line { 
+  background: rgba(218, 119, 86, 0.85); 
+}
+
+.dock-scroll-hint {
+  text-align: center;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.2);
+  padding: 8px 16px 4px;
+  user-select: none;
+}
+
+.dock-line-new { animation: dock-pulse 0.5s ease-in-out 3; }
+@keyframes dock-pulse {
+  0% { background: rgba(218, 119, 86, 0.5); }
+  50% { background: rgba(218, 119, 86, 0.95); }
+  100% { background: rgba(218, 119, 86, 0.5); }
+}
