@@ -266,6 +266,7 @@
 }
 
 #dock-row-dropdown {
+  position: absolute;
   background: rgba(26, 23, 41, 0.98);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
@@ -273,6 +274,7 @@
   padding: 4px;
   min-width: 110px;
   z-index: 2147483647;
+  transform-origin: left top;
   animation: dropdown-fade-in 0.12s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
@@ -537,10 +539,11 @@
 #dock-prompt-list {
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 0px;
+  /* cushion spacing so single rows don't kiss the curved edge mask */
+  padding-bottom: 8px; 
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
-  
-  /* FIX: Prevents container from collapsing flat and clipping row actions */
-  min-height: 75px; 
+}
+#dock-row-dropdown.opens-upward {
+  transform-origin: left bottom;
 }

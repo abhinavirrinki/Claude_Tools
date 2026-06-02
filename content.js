@@ -238,13 +238,12 @@ function toggleRowDropdown(anchorButton, text, index) {
     let existingDropdown = document.getElementById('dock-row-dropdown');
     if (existingDropdown) {
       existingDropdown.remove();
-      // If clicking the same button twice, toggle it closed
       if (existingDropdown.dataset.anchorIndex == index) return;
     }
 
     const dropdown = document.createElement('div');
     dropdown.id = 'dock-row-dropdown';
-    dropdown.dataset.anchorIndex = index; // Track which row opened it
+    dropdown.dataset.anchorIndex = index;
 
     const printOption = document.createElement('div');
     printOption.className = 'dock-row-dropdown-item';
@@ -253,30 +252,46 @@ function toggleRowDropdown(anchorButton, text, index) {
     printOption.addEventListener('click', (e) => {
       e.stopPropagation();
       dropdown.remove();
-      
       scrollToPrompt(index);
-      
       const domPrompt = findInDOM(text, index);
       executeTargetPrint(text, index, domPrompt);
     });
 
     dropdown.appendChild(printOption);
 
-    // Find the current parent row item to anchor the menu cleanly
     const parentRow = anchorButton.closest('.dock-prompt-item');
-    const dockContainer = document.querySelector('.dock-expanded');
+    const dockExpanded = document.querySelector('.dock-expanded');
 
-    if (parentRow && dockContainer) {
+    if (parentRow && dockExpanded) {
       dropdown.style.position = 'absolute';
       
-      // Calculate top relative to the parent row container, fully ignoring scroll metrics bugs
-      const offsetTop = parentRow.offsetTop + anchorButton.offsetTop + anchorButton.offsetHeight;
-      dropdown.style.top = `${offsetTop + 4}px`;
+      // 1. First, append it to the DOM so it has a measurable height
+      dockExpanded.appendChild(dropdown);
       
-      // Keep it cleanly aligned under the dots column context 
+      // 2. Get positioning metrics
+      const parentTop = parentRow.offsetTop;
+      const anchorTop = anchorButton.offsetTop;
+      const anchorHeight = anchorButton.offsetHeight;
+      const dropdownHeight = dropdown.offsetHeight;
+      
+      // Calculate where the bottom of the dropdown would be if it opens downward
+      const dropdownBottomExpected = parentTop + anchorTop + anchorHeight + dropdownHeight + 4;
+      
+      // Check if it will run past the visible height of the dock container
+      const containerHeight = dockExpanded.clientHeight;
+
+      if (dropdownBottomExpected > containerHeight) {
+        // EDGE CASE HIT: Flip it to open UPWARD instead
+        const offsetTop = parentTop + anchorTop - dropdownHeight - 4;
+        dropdown.style.top = `${offsetTop}px`;
+        dropdown.classList.add('opens-upward'); // Optional: for styling tweaks
+      } else {
+        // STANDARD CASE: Open downward naturally
+        const offsetTop = parentTop + anchorTop + anchorHeight + 4;
+        dropdown.style.top = `${offsetTop}px`;
+      }
+      
       dropdown.style.left = `16px`; 
-      
-      dockContainer.appendChild(dropdown);
     }
   }
 
