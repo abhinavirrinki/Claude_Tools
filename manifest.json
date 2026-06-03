@@ -1,23 +1,24 @@
 {
   "manifest_version": 3,
-  "name": "Prompt Dock Pro",
-  "version": "5.2",
-  "description": "An ultra-smooth floating dock showing your prompts across Claude and Gemini",
-  "permissions": ["activeTab", "storage"],
-  "content_scripts": [
-    {
-      "matches": [
-        "https://claude.ai/*",
-        "https://gemini.google.com/*"
-      ],
-      "js": ["content.js"],
-      "css": ["dock.css"],
-      "run_at": "document_end"
-    }
-  ],
+  "name": "Claude Prompts Dock",
+  "version": "1.0.0",
+  "description": "A floating sidebar companion to search, bookmark, and export your chat prompts effortlessly.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
-  }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://claude.ai/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "dock.css"
+      ]
+    }
+  ]
 }

@@ -73,8 +73,6 @@
   display: flex;
   flex-direction: column;
   overflow: hidden; 
-  
-  /* UPDATED: 0.4s exit delay as requested */
   transition: opacity 0.2s cubic-bezier(0.25, 1, 0.5, 1) 0.4s, 
               visibility 0.2s ease 0.4s, 
               min-height 0.2s cubic-bezier(0.25, 1, 0.5, 1);
@@ -309,7 +307,7 @@
 #dock-prompt-list {
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 16px;
+  padding-bottom: 8px; 
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
 }
@@ -329,7 +327,7 @@
 #dock-prompt-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 2px; }
 
 .dock-prompt-item {
-  padding: 8px 16px; /* Tighter spacing as requested */
+  padding: 8px 16px; 
   cursor: pointer;
   display: flex;
   align-items: flex-start;
@@ -359,7 +357,6 @@
 
 .dock-prompt-item:hover .dock-prompt-num { color: rgba(218, 119, 86, 1); }
 
-/* Optimized action tray: stable height footprint */
 .dock-action-tray {
   display: flex;
   flex-direction: row; 
@@ -470,9 +467,7 @@
   color: #ffffff !important; 
 }
 
-.dock-print-all-favourites-btn:active {
-  transform: scale(0.98);
-}
+.dock-print-all-favourites-btn:active { transform: scale(0.98); }
 
 .dock-print-responses-only-link {
   font-size: 11.5px;
@@ -490,45 +485,12 @@
   color: #ffffff !important; 
 }
 
-.dock-print-responses-only-link:active {
-  transform: scale(0.96);
-} 
-.dock-scroll-hint {
-  text-align: center;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.2);
-  padding: 12px 16px 16px; /* Restored original spacing */
-  user-select: none;
-  background: transparent; /* Removed sticky background to prevent overlay */
-  position: static;        /* Removed sticky positioning to restore natural flow */
-  width: 100%;
-}
-
-#dock-prompt-list {
-  flex: 1;
-  overflow-y: auto;
-  padding-bottom: 0px; /* Reduced from 16px to 0px */
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
-}
-
-/* 2. Update the scroll hint to be perfectly flush */
-.dock-scroll-hint {
-  text-align: center;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.2);
-  padding: 12px 16px 8px; /* Reduced bottom padding */
-  user-select: none;
-  background: transparent;
-  position: static;
-  width: 100%;
-}
+.dock-print-responses-only-link:active { transform: scale(0.96); } 
 
 .dock-scroll-hint {
   text-align: center;
   font-size: 11px;
   color: rgba(255, 255, 255, 0.2);
-  /* Adjusted padding: top 20px, horizontal 16px, bottom 4px */
   padding: 20px 16px 4px; 
   user-select: none;
   background: transparent;
@@ -536,14 +498,6 @@
   width: 100%;
 }
 
-#dock-prompt-list {
-  flex: 1;
-  overflow-y: auto;
-  /* cushion spacing so single rows don't kiss the curved edge mask */
-  padding-bottom: 8px; 
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
-}
 #dock-row-dropdown.opens-upward {
   transform-origin: left bottom;
 }

@@ -37,19 +37,31 @@
   }
 
   function loadFromStorage(cb) {
-    const k = getKey();
-    const sk = getStarredKey();
-    chrome.storage.local.get([k, sk], (result) => {
-      cb(result[k] || [], result[sk] || []);
-    });
+    try {
+      const storedData = localStorage.getItem(getKey());
+      const starredData = localStorage.getItem(getStarredKey());
+      const stored = storedData ? JSON.parse(storedData) : [];
+      const starred = starredData ? JSON.parse(starredData) : [];
+      cb(stored, starred);
+    } catch (e) {
+      cb([], []);
+    }
   }
 
   function saveToStorage(data) {
-    chrome.storage.local.set({ [getKey()]: data });
+    try {
+      localStorage.setItem(getKey(), JSON.stringify(data));
+    } catch (e) {
+      console.error("Storage write failed", e);
+    }
   }
 
   function saveStarredToStorage(data) {
-    chrome.storage.local.set({ [getStarredKey()]: data });
+    try {
+      localStorage.setItem(getStarredKey(), JSON.stringify(data));
+    } catch (e) {
+      console.error("Storage write failed", e);
+    }
   }
 
   function updateActiveState() {
@@ -233,7 +245,7 @@
     if (dropdown) dropdown.remove();
   }
 
-function toggleRowDropdown(anchorButton, text, index) {
+  function toggleRowDropdown(anchorButton, text, index) {
     closeHeaderDropdown();
     let existingDropdown = document.getElementById('dock-row-dropdown');
     if (existingDropdown) {
@@ -264,29 +276,21 @@ function toggleRowDropdown(anchorButton, text, index) {
 
     if (parentRow && dockExpanded) {
       dropdown.style.position = 'absolute';
-      
-      // 1. First, append it to the DOM so it has a measurable height
       dockExpanded.appendChild(dropdown);
       
-      // 2. Get positioning metrics
       const parentTop = parentRow.offsetTop;
       const anchorTop = anchorButton.offsetTop;
       const anchorHeight = anchorButton.offsetHeight;
       const dropdownHeight = dropdown.offsetHeight;
       
-      // Calculate where the bottom of the dropdown would be if it opens downward
       const dropdownBottomExpected = parentTop + anchorTop + anchorHeight + dropdownHeight + 4;
-      
-      // Check if it will run past the visible height of the dock container
       const containerHeight = dockExpanded.clientHeight;
 
       if (dropdownBottomExpected > containerHeight) {
-        // EDGE CASE HIT: Flip it to open UPWARD instead
         const offsetTop = parentTop + anchorTop - dropdownHeight - 4;
         dropdown.style.top = `${offsetTop}px`;
-        dropdown.classList.add('opens-upward'); // Optional: for styling tweaks
+        dropdown.classList.add('opens-upward');
       } else {
-        // STANDARD CASE: Open downward naturally
         const offsetTop = parentTop + anchorTop + anchorHeight + 4;
         dropdown.style.top = `${offsetTop}px`;
       }
@@ -382,140 +386,25 @@ function toggleRowDropdown(anchorButton, text, index) {
             page-break-inside: avoid !important;
         }
     }
-
     body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         line-height: 1.55;
         color: #191919;
         padding: 40px max(24px, calc((100% - 660px) / 2));
         background: #fbfaf7;
         word-wrap: break-word;
     }
-
-    .print-top-head-spacer {
-        height: 0.6in;
-        display: block;
-        width: 100%;
-    }
-
-    .qa-container {
-        display: flex;
-        flex-direction: column;
-        gap: 32px;
-        width: 100%;
-        margin-bottom: 40px;
-    }
-
-    .section-label {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        font-size: 10.5px;
-        font-weight: 700;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        margin-bottom: 10px;
-        color: #cc6644;
-        user-select: none;
-    }
-
-    .question-block {
-        background: #f3f0ea;
-        border-radius: 10px;
-        padding: 16px 20px;
-        white-space: pre-wrap;
-        font-size: 14px;
-        line-height: 1.5;
-        color: #222222;
-        border: 1px solid #e6e2da;
-        box-sizing: border-box;
-        width: 100%;
-    }
-
-    .answer-block {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Georgia, Cambria, serif;
-        font-size: 14.5px;
-        color: #191919;
-        line-height: 1.6;
-        width: 100%;
-    }
-
+    .print-top-head-spacer { height: 0.6in; display: block; width: 100%; }
+    .qa-container { display: flex; flex-direction: column; gap: 32px; width: 100%; margin-bottom: 40px; }
+    .section-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; color: #cc6644; }
+    .question-block { background: #f3f0ea; border-radius: 10px; padding: 16px 20px; white-space: pre-wrap; font-size: 14px; color: #222222; border: 1px solid #e6e2da; box-sizing: border-box; width: 100%; }
+    .answer-block { font-size: 14.5px; color: #191919; line-height: 1.6; width: 100%; }
     p { margin: 0 0 12px 0; }
-    p:last-child { margin-bottom: 0; }
-    
-    h1, h2, h3, h4 {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        color: #111111;
-        font-weight: 600;
-        margin: 24px 0 10px 0;
-        line-height: 1.3;
-    }
-    h1 { font-size: 19px; }
-    h2 { font-size: 17px; border-bottom: 1px solid #e6e2da; padding-bottom: 4px; }
-    h3 { font-size: 15px; }
-
-    pre {
-        background: #f0ece3 !important;
-        border: 1px solid #e1dbcf !important;
-        border-radius: 6px !important;
-        padding: 14px 18px !important;
-        overflow-x: auto !important;
-        margin: 16px 0 !important;
-        box-sizing: border-box;
-        width: 100%;
-        white-space: pre-wrap !important;
-        word-wrap: break-word !important;
-    }
-
-    code {
-        font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace !important;
-        font-size: 12.5px !important;
-        background: #f0ece3;
-        color: #111111;
-        padding: 2px 4px;
-        border-radius: 4px;
-        word-break: break-word !important;
-    }
-
-    pre code {
-        background: transparent !important;
-        padding: 0 !important;
-        border-radius: 0 !important;
-        font-size: 12px !important;
-        color: #222222 !important;
-        white-space: pre-wrap !important;
-    }
-
-    ul, ol { margin: 0 0 12px 0; padding-left: 20px; }
-    li { margin-bottom: 4px; }
-
-    table {
-        border-collapse: collapse;
-        width: 100% !important;
-        margin: 20px 0;
-        font-size: 13.5px;
-        background: #ffffff;
-        border-radius: 6px;
-        border: 1px solid #e6e2da;
-        box-sizing: border-box;
-    }
-
-    th, td {
-        padding: 10px 14px;
-        text-align: left;
-        border-bottom: 1px solid #e6e2da;
-        word-break: break-word;
-    }
-
-    th {
-        background: #f3f0ea;
-        font-weight: 600;
-        color: #222222;
-    }
-
-    tr:last-child td { border-bottom: none; }
-
-    button, .sr-only, [class*="feedback-"], [class*="controls-"], .heading-actions, [class*="contents-"] button {
-        display: none !important;
-    }
+    h1, h2, h3 { color: #111111; font-weight: 600; margin: 24px 0 10px 0; }
+    pre { background: #f0ece3 !important; border: 1px solid #e1dbcf !important; border-radius: 6px !important; padding: 14px 18px !important; overflow-x: auto !important; margin: 16px 0 !important; white-space: pre-wrap !important; }
+    code { font-family: monospace !important; font-size: 12.5px !important; background: #f0ece3; padding: 2px 4px; border-radius: 4px; }
+    table { border-collapse: collapse; width: 100% !important; margin: 20px 0; border: 1px solid #e6e2da; }
+    th, td { padding: 10px 14px; border-bottom: 1px solid #e6e2da; }
   `;
 
   function executeTargetPrint(text, listIndex, promptNode) {
@@ -537,7 +426,6 @@ function toggleRowDropdown(anchorButton, text, index) {
       <html>
       <head>
           <meta charset="UTF-8">
-          <title>Exported Conversation Element</title>
           <style>${SHARED_PRINT_STYLES}</style>
       </head>
       <body>
@@ -618,12 +506,9 @@ function toggleRowDropdown(anchorButton, text, index) {
       <html>
       <head>
           <meta charset="UTF-8">
-          <title>Exported Starred Prompts Compilation</title>
           <style>${SHARED_PRINT_STYLES}</style>
       </head>
-      <body>
-         ${globalPacketsHTML}
-      </body>
+      <body>${globalPacketsHTML}</body>
       </html>
     `;
 
@@ -668,9 +553,7 @@ function toggleRowDropdown(anchorButton, text, index) {
              <div class="qa-container">
                 <div>
                     <div class="section-label">Response ${continuousIndex}</div>
-                    <div class="answer-block" style="margin-top: 12px;">
-                        ${responseHTML}
-                    </div>
+                    <div class="answer-block" style="margin-top: 12px;">${responseHTML}</div>
                 </div>
              </div>
           </div>
@@ -689,12 +572,9 @@ function toggleRowDropdown(anchorButton, text, index) {
       <html>
       <head>
           <meta charset="UTF-8">
-          <title>Exported Responses Only Compilation</title>
           <style>${SHARED_PRINT_STYLES}</style>
       </head>
-      <body>
-         ${responsesOnlyHTML}
-      </body>
+      <body>${responsesOnlyHTML}</body>
       </html>
     `;
 
@@ -722,18 +602,13 @@ function toggleRowDropdown(anchorButton, text, index) {
 
     if (dock) {
       dock.classList.add('is-filtering');
-      if (forceState) {
-        dock.classList.add('favorites-view-active');
-      } else {
-        dock.classList.remove('favorites-view-active');
-      }
+      if (forceState) dock.classList.add('favorites-view-active');
+      else dock.classList.remove('favorites-view-active');
     }
 
     if (forceState && expandedPanel) {
       const currentHeight = expandedPanel.offsetHeight;
-      if (currentHeight > 0) {
-        expandedPanel.style.minHeight = `${currentHeight}px`;
-      }
+      if (currentHeight > 0) expandedPanel.style.minHeight = `${currentHeight}px`;
     } else if (!forceState && expandedPanel) {
       expandedPanel.style.minHeight = '';
     }
@@ -758,10 +633,7 @@ function toggleRowDropdown(anchorButton, text, index) {
     }
 
     renderPromptList();
-
-    setTimeout(() => {
-      if (dock) dock.classList.remove('is-filtering');
-    }, 350);
+    setTimeout(() => { if (dock) dock.classList.remove('is-filtering'); }, 350);
   }
 
   function createPromptRowElement(text, index) {
@@ -773,9 +645,7 @@ function toggleRowDropdown(anchorButton, text, index) {
 
     const uniqueStarId = makeUniqueStarId(index);
     const isStarred = starredPrompts.includes(uniqueStarId);
-    if (isStarred) {
-      item.classList.add('is-starred-row');
-    }
+    if (isStarred) item.classList.add('is-starred-row');
 
     const metaCol = document.createElement('div');
     metaCol.className = 'dock-meta-column';
@@ -792,7 +662,6 @@ function toggleRowDropdown(anchorButton, text, index) {
     starBtn.className = 'dock-star-btn';
     if (isStarred) starBtn.classList.add('starred');
     starBtn.innerHTML = isStarred ? '★' : '☆';
-
     starBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       toggleStarStatus(index, starBtn, item);
@@ -801,7 +670,6 @@ function toggleRowDropdown(anchorButton, text, index) {
     const moreBtn = document.createElement('button');
     moreBtn.className = 'dock-more-btn';
     moreBtn.innerHTML = '•••';
-
     moreBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       toggleRowDropdown(moreBtn, text, index);
@@ -826,10 +694,6 @@ function toggleRowDropdown(anchorButton, text, index) {
     item.appendChild(textEl);
 
     item.addEventListener('click', () => scrollToPrompt(index));
-    item.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') scrollToPrompt(index);
-    });
-
     return item;
   }
 
@@ -842,10 +706,7 @@ function toggleRowDropdown(anchorButton, text, index) {
       starBtnNode.classList.remove('starred');
       starBtnNode.innerHTML = '☆';
       rowNode.classList.remove('is-starred-row');
-
-      if (isFavoritesFilterActive) {
-        setTimeout(renderPromptList, 100);
-      }
+      if (isFavoritesFilterActive) setTimeout(renderPromptList, 100);
     } else {
       starredPrompts.push(uniqueStarId);
       starBtnNode.classList.add('starred');
@@ -859,9 +720,7 @@ function toggleRowDropdown(anchorButton, text, index) {
     if (isFavoritesFilterActive || isSearchActive) return;
     const promptList = document.getElementById('dock-prompt-list');
     if (promptList && promptList.scrollHeight > 0) {
-      setTimeout(() => {
-        promptList.scrollTop = promptList.scrollHeight;
-      }, 50);
+      setTimeout(() => { promptList.scrollTop = promptList.scrollHeight; }, 50);
     }
   }
 
@@ -895,9 +754,7 @@ function toggleRowDropdown(anchorButton, text, index) {
       }
     });
 
-    if (countBadge) {
-      countBadge.textContent = itemsToRender.length;
-    }
+    if (countBadge) countBadge.textContent = itemsToRender.length;
 
     if (itemsToRender.length === 0) {
       const empty = document.createElement('div');
@@ -1003,11 +860,10 @@ function toggleRowDropdown(anchorButton, text, index) {
         const targetScrollerCenter = scrollerRect.top + (scrollerRect.height / 2);
         const errorOffset = currentElementCenter - targetScrollerCenter;
 
-        if (Math.abs(errorOffset) > 2) {
-          scroller.scrollTop += errorOffset;
-        }
+        if (Math.abs(errorOffset) > 2) scroller.scrollTop += errorOffset;
         if (delay === 800) {
-          highlight(element);
+          element.style.outline = "2px dashed #da7756";
+          setTimeout(() => { element.style.outline = "none"; }, 1500);
         }
       }, delay);
     });
@@ -1018,22 +874,14 @@ function toggleRowDropdown(anchorButton, text, index) {
     if (!text) return;
 
     activeIndex = index;
-
-    document.querySelectorAll('.dock-prompt-item.active').forEach(item => {
-      item.classList.remove('active');
-    });
+    document.querySelectorAll('.dock-prompt-item.active').forEach(item => { item.classList.remove('active'); });
 
     const targetRow = document.querySelector(`.dock-prompt-item[data-index="${index}"]`);
-    if (targetRow) {
-      targetRow.classList.add('active');
-    }
+    if (targetRow) targetRow.classList.add('active');
 
     const domEl = findInDOM(text, index);
-    if (domEl) {
-      stabilizeTargetScroll(domEl);
-    } else {
-      scrollUntilFound(text, index);
-    }
+    if (domEl) stabilizeTargetScroll(domEl);
+    else scrollUntilFound(text, index);
   }
 
   function refresh() {
@@ -1066,12 +914,10 @@ function toggleRowDropdown(anchorButton, text, index) {
     if (!activeConfig) return;
 
     const target = document.querySelector(activeConfig.selectors.mainContent) || document.body;
-
     observer = new MutationObserver(() => {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(refresh, 250);
     });
-
     observer.observe(target, { childList: true, subtree: true });
   }
 
@@ -1091,10 +937,7 @@ function toggleRowDropdown(anchorButton, text, index) {
         starredPrompts = starred;
         renderPromptList();
         snapDockToBottom();
-        setTimeout(() => {
-          startObserving();
-          refresh();
-        }, 600);
+        setTimeout(() => { startObserving(); refresh(); }, 600);
       });
     }
   }, 500);
